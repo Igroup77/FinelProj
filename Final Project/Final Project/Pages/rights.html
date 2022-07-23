@@ -1,0 +1,465 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous">
+    </script>
+    <title>מאגר זכויות</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+    <script src="../Scripts/ajaxCalls.js"></script>
+
+    <!-- For PopUp Form -->
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/style.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script>
+
+        UserDetails = [];
+        $(document).ready(function () {
+            f2();
+            ajaxCall("GET", "../api/Rights", "", getRightsSuccessCB, getRightsErrorCB); //rights to data table
+            if (localStorage["UserDetails"] != null) {
+                UserDetails = JSON.parse(localStorage["UserDetails"]);
+            }
+            document.getElementById("userName").innerHTML = UserDetails[0]["First_name"] + " " + UserDetails[0]["Last_name"];
+            document.getElementById("userName2").innerHTML = UserDetails[0]["First_name"] + " " + UserDetails[0]["Last_name"];
+            document.getElementById("userRole").innerHTML = UserDetails[0]["Role"];
+            $(document).on("click", ".delete", updateStatus);
+        });
+
+        counter = 0;
+
+        function updateStatus() {
+            $(this).attr("disabled", true);
+            temp = $(this).attr("id");
+            right = {
+                Id: temp
+            }
+            console.log(right);
+            ajaxCall("DELETE", "../api/Rights", JSON.stringify(right), delSCB, delECB);
+        }
+
+        function delSCB(status) {
+            console.log(status);
+            ajaxCall("GET", "../api/Rights", "", getRightsSuccessCB, getRightsErrorCB);
+        }
+        function delECB(err) {
+            console.log(err);
+        }
+
+        function f2() {
+            $('.dataTable-top').hide();
+        }
+
+        function getRightsSuccessCB(rightList) { //update to string all numeric values
+            console.log(rightList)
+            let i = 0;
+            right_list = rightList;
+            if (counter > 0) {
+                tbl.destroy();
+            }
+            try {
+                counter++;
+                tbl = $('#rightsTBL').DataTable({
+                    searching: true,
+                    'bInfo': false,
+                    dom: 'Blfrtip',
+                    "orderable": true,
+                    "data": null,
+                    "defaultContent": '',
+                    "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    buttons: [
+                        {
+                            text: 'הוספת זכות חדשה',
+                            action: function (e, dt, node, config) { location.href = "NewRightPage.html" } //add new right
+                        },
+                        {
+                            extend: 'excelHtml5', //excel file
+                            text: 'ייצא לאקסל'
+                        }
+                    ],
+                    data: rightList,
+                    pageLength: 5,
+                    columns: [
+                        {
+                            "className": 'dt-control',
+                            "orderable": false,
+                            "data": null,
+                            "defaultContent": ''
+                        },
+                        {
+                            render: function (data, type, row, meta) {
+                                i = row.Id;                                
+                                return i.toString();
+                            }
+                        },
+                        { data: "Name" },
+                        { data: "Source" },
+                        { data: "InsertAdmin" },
+                        { data: "Date" },
+                        {
+                            render: function (data, type, row, meta) {
+                                return "<button type='button' id='" + row.Id + "' class='edit'><i class='fa fa-edit'></i></button>";
+                            }
+                        },
+
+                        {
+                            render: function (data, type, row, meta) {
+                                return "<button type='button' id='" + row.Id + "' class='delete'><i class='fa fa-trash-o'></i></button>"
+                            }
+                        }
+
+
+                    ],
+                });
+
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+
+        function getRightsErrorCB(err) {
+            console.log(err);
+        }
+
+        $(document).on("click", ".edit", openEditRight); //edit selected right
+
+        function openEditRight() {
+            console.log("in edit right func")
+            var tr = $(this).closest('tr');
+            var row = tbl.row(tr);
+            console.log(row.data())
+            localStorage["EditedRightData"] = JSON.stringify(row.data())
+            window.open("EditRightPage.html", "_self")
+        }
+
+        $(document).on("click", "#logOUT", logOUT);
+        function logOUT() {
+            localStorage.removeItem("UserDetails");
+            window.open("pages-login.html", "_self");
+        }
+
+        $(document).on('click', 'td.dt-control', function () {
+            var tr = $(this).closest('tr');
+            var row = tbl.row(tr);
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child.hide();
+                tr.removeClass('shown');
+            }
+            else {
+                // Open this row
+                row.child(format(row.data())).show();
+                tr.addClass('shown');
+            }
+        });
+
+        function format(d) {
+            if (d.St3 == null)
+                var st3 = "לא קיים"
+            else var st3 = d.St3
+
+            if (d.Residance == 1)
+                var res = "כן"
+            else var res = "לא"
+
+            if (d.Fstatus == 0)
+                var fs = "הכל"
+            else var fs = "יאופיין בהמשך"
+
+            if (d.Min_disap == 0)
+                var mid = "לא קיים גבול תחתון"
+            else var mid = d.Min_disap
+            if (d.Max_disap == 0)
+                var mad = "לא קיים גבול עליון"
+            else var mad = d.Max_disap
+
+            if (d.MinInc == 0)
+                var minc = "לא קיים גבול תחתון"
+            else var minc = d.MinInc
+            if (d.MaxInc == 0)
+                var maxinc = "לא קיים גבול עליון"
+            else var maxinc = d.MaxInc
+
+            if (d.MinAge == 0)
+                var mia = "לא קיים גבול תחתון"
+            else var mia = d.MinAge
+            if (d.MaxAge == 0)
+                var maa = "לא קיים גבול עליון"
+            else var maa = d.MaxAge
+
+            if (d.Workdis == 0)
+                var wd = "לא"
+            else var wd = "כן"
+
+            return '<table id="innerTBL"  dir="rtl" cellspacing="0" border="0" style="width:100%;">' +
+                '<tr>' +
+                '<td ><b>כותרות ראשיות</b></td>' +
+                '<td colspan="5"> <ul> <li>' + d.St1 + '</li> <li>' + d.St2 + '</li> <li>' + st3 + '</li> </ul> </td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td ><b>פסקת תיאור הזכות</b>:</td>' +
+                '<td colspan="5">' + d.Description + '</td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td><b>תאונות ספציפיות:</b> ' + d.Accident_type + '</td>' +
+                '<td id="innerTD"><b> דורשת תושבות ישראלית:</b> ' + res + '</td>' +
+                '<td id="innerTD"><b>סטטוס משפחתי:</b> ' + fs + '</td>' +
+                '<td><b>פגיעה בכושר עבודה: </b>' + wd + '</td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td><b>הכנסה מינימלית דרושה: </b>' + minc + '</td>' +
+                '<td id="innerTD"> <b>הכנסה מקסימלית: </b>' + maxinc + '</td>' +
+                '<td><b>אחוזי נכות מינימלים לזכאות:</b> ' + mid + '</td>' +
+                '<td id="innerTD"> <b>אחוזי נכות מקסימלים לזכאות:</b> ' + mad + '</td>' +
+
+                '</tr>' +
+                '<td ><b>קישור לכל זכות: </b><a href="' + d.CzUrl + '">לחץ פה</a></td>' +
+                '<td><b>מגדר: </b> ' + d.Gender + '</td>' +
+                '<td id="innerTD"><b>גיל מינימלי לזכאות: </b>' + mia + '</td>' +
+                '<td><b>גיל מקסימלי לזכאות:</b> ' + maa + '</td>' +
+                '</tr>' +
+                '</table>';
+        }
+
+    </script>
+    <style>
+        .dataTable-top {
+            visibility: hidden !important;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="header fixed-top d-flex align-items-center">
+
+        <div class="d-flex align-items-center justify-content-between">
+            <a href="index.html" class="logo d-flex align-items-center">
+                <img src="assets/img/logo.png" alt="">
+                <span class="d-none d-lg-block">זכויותון בית לוינשטיין</span>
+            </a>
+            <i class="bi bi-list toggle-sidebar-btn"></i>
+        </div><!-- End Logo -->
+       
+        <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center">
+
+                <li class="nav-item d-block d-lg-none">
+                    <a class="nav-link nav-icon search-bar-toggle " href="#">
+                        <i class="bi bi-search"></i>
+                    </a>
+                </li><!-- End Search Icon-->
+
+
+                <li class="nav-item dropdown pe-3">
+
+                    <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                        <img src="assets/img/default-avatar.png" alt="Profile" class="rounded-circle">
+
+                        <span class="d-none d-md-block dropdown-toggle ps-2" id="userName"> </span>
+                    </a><!-- End Profile Iamge Icon -->
+
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                        <li class="dropdown-header">
+                            <h6 id="userName2"> </h6>
+                            <span id="userRole"></span>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
+                                <i class="bi bi-person"></i>
+                                <span>הפרופיל שלי</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
+                                <i class="bi bi-question-circle"></i>
+                                <span>עזרה</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a id="logOUT" class="dropdown-item d-flex align-items-center" href="#">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>יציאה מהמערכת</span>
+                            </a>
+                        </li>
+
+                    </ul><!-- End Profile Dropdown Items -->
+                </li><!-- End Profile Nav -->
+
+            </ul>
+        </nav><!-- End Icons Navigation -->
+
+    </header><!-- End Header -->
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar">
+
+        <ul class="sidebar-nav" id="sidebar-nav">
+
+            <li class="nav-item">
+                <a class="nav-link " href="index.html">
+                    <i class="bi bi-grid"></i>
+                    <span>מסך בית</span>
+                </a>
+            </li><!-- End Dashboard Nav -->
+
+            <li class="nav-heading">מאגרים</li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="rights.html">
+                    <i class="bi bi-menu-button-wide"></i>
+                    <span>מאגר זכויות</span>
+                </a>
+            </li><!-- End מאגר זכויות-->
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="users.html">
+                    <i class="bi bi-person"></i>
+                    <span>מאגר משתמשים</span>
+                </a>
+            </li><!-- End מאגר משתמשים -->
+
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="admins.html">
+                    <i class="bi bi-card-list"></i>
+                    <span>מאגר אדמינים</span>
+                </a>
+            </li><!-- Endמאגר אדמינים  -->
+
+
+        </ul>
+
+    </aside><!-- End Sidebar-->
+
+    <main id="main" class="main">
+        <!--<div class="pagetitle">
+            <h1>מאגר זכויות</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.html">מסך בית</a></li>
+                    <li class="breadcrumb-item active">מאגר זכויות</li>
+                </ol>
+            </nav>
+        </div>--><!-- End Page Title -->
+
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <div class="card">
+                        <div class="card-body">
+                            <p dir="rtl">מאגר הזכויות ניתן לעריכה, אנא שים לב כי הינך בטוח לפני שתבצע שינוי שישפיע על כלל משתמשי המערכת</p>
+                            
+                            <!-- Table with stripped rows -->
+                            <table id="rightsTBL" class="table datatable" dir="rtl">
+
+                                <thead>
+                                    <tr>
+                                        <th scope="col"></th>
+                                        <th scope="col">מזהה זכות</th>
+                                        <th scope="col">שם הזכות</th>
+                                        <th scope="col">מקור הזכות</th>
+                                        <th scope="col">הוזנה על ידי</th>
+                                        <th scope="col">תאריך הזנה למערכת</th>
+                                        <th scope="col">עריכה</th>
+                                        <th scope="col">מחיקה</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                            <!-- End Table with stripped rows -->
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main><!-- End #main -->
+    <!-- ======= Footer ======= -->
+    <footer id="footer" class="footer">
+        <div class="credits">
+            <img style="height:100px" src="assets/img/BigLogo.png" />
+        </div>
+
+    </footer><!-- End Footer -->
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/chart.js/chart.min.js"></script>
+    <script src="assets/vendor/echarts/echarts.min.js"></script>
+    <script src="assets/vendor/quill/quill.min.js"></script>
+    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="assets/js/main.js"></script>
+
+    <!-- DataTable css -->
+
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+    <script src="https://cdn.datatables.net/buttons/1.6.4/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.4/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.4/js/buttons.html5.min.js"></script>
+
+ 
+
+</body>
+
+</html>

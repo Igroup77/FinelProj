@@ -1,0 +1,316 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>זכויותון בית לוינשטיין</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous">
+    </script>
+    <script src="../Scripts/ajaxCalls.js"></script>
+
+    <!-- Favicons -->
+    <link href="assets/img/logo.png" rel="icon">
+    <link href="assets/img/BigLogo.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/style.css" rel="stylesheet">
+
+    <script>
+        UserDetails = [];
+        $(document).ready(function () {
+            if (localStorage["UserDetails"] != null) {
+                UserDetails = JSON.parse(localStorage["UserDetails"]);
+            }
+            console.log(UserDetails[0]["Name"] + " is in the houssseeee");
+            document.getElementById("userName").innerHTML = UserDetails[0]["Name"];
+            document.getElementById("userName2").innerHTML = UserDetails[0]["Name"];
+
+            let apiCall = "../api/Rights?id=" + UserDetails[0]["Id"] + "&name=" + UserDetails[0]["Name"];
+
+            ajaxCall("GET", apiCall, "", getSCB, getErrorCB); //מביא את הדאטה על הזכויות השמורות למשתמש
+        });
+
+        $(document).on("click", "#logOUT", logOUT);
+        function logOUT() {
+            localStorage.removeItem("UserDetails");
+            window.open("U-loginUser.html", "_self");
+        }
+
+        function changeColor(id) {
+        var patt1 = /[0-9]/g;
+        var patt2 = /[a-zA-Z]/g;
+        var type = id.match(patt2);
+        var temp = id.match(patt1)
+        var rightID = temp.join("");
+
+            //arr = id.split("");
+            //rightID = arr[0];
+            //type = arr[1];
+            newStatus = "";
+            if (type == "r") {
+                $("#" + rightID + 'r').attr('class', 'btn btn-danger');
+                $("#" + rightID + 'b').attr('class', 'btn btn-outline-primary');
+                $("#" + rightID + 'm').attr('class', 'btn btn-outline-primary');
+                newStatus = 1;
+            }
+            else if (type == "b") {
+                $("#" + rightID + 'r').attr('class', 'btn btn-outline-primary');
+                $("#" + rightID + 'b').attr('class', 'btn btn-warning');
+                $("#" + rightID + 'm').attr('class', 'btn btn-outline-primary');
+                newStatus = 2;
+            }
+            else {
+                $("#" + rightID + 'r').attr('class', 'btn btn-outline-primary');
+                $("#" + rightID + 'b').attr('class', 'btn btn-outline-primary');
+                $("#" + rightID + 'm').attr('class', 'btn btn-success');
+                newStatus = 3;
+            }
+            userID = UserDetails[0]["Id"];
+            console.log("new status=" + newStatus);
+            console.log("user id=" + userID);
+            console.log("right id=" + rightID);
+
+            let apiCall = "../api/DashBoards?uid=" + userID + "&rid=" + rightID + "&status=" + newStatus;
+
+            ajaxCall("GET", apiCall, "", getChangeSCB, getChangeErrorCB);
+        }
+
+        function getChangeSCB(status) {
+            console.log(status);
+        }
+
+        function getChangeErrorCB(err) {
+            console.log(err);
+        }
+
+
+        function getSCB(status) {
+            classGreen = "btn btn-success";
+            classRed = "btn btn-danger";
+            classYellow = "btn btn-warning";
+            classNull = "btn btn-outline-primary";
+
+            str = "";
+
+            for (let i = 0; i < status.length; i++) {
+                str += '<div class="col - xl - 12">';
+                str += '<div class="card info-card revenue-card">';
+                str += '<div class="card">';
+                str += '<h5 class="card-title">' + status[i]["Name"] + '</h5>';
+                str += status[i]["Description"];
+                str += '<div class="card-footer">';
+                str += '<a href="' + status[i]["CzUrl"] + '">קישור לכל זכות</a>';
+                str += '</div>';
+                str += '<div class="btn-group" role="group" aria-label="Basic mixed styles example">';
+                if (status[i]["Rstatus"] == 1) {
+                    str += '<button type="button" id="' + status[i]["Id"] + "r" + '"class="' + classRed + '">ראיתי</button>';
+                    str += '<button type="button" id="' + status[i]["Id"] + "b" + '"onclick="changeColor(this.id)" class="' + classNull + '">בתהליך</button>';
+                    str += '<button type="button" id="' + status[i]["Id"] + "m" + '"onclick="changeColor(this.id)" class="' + classNull + '">מימשתי</button>';
+                }
+                else if (status[i]["Rstatus"] == 2) {
+                    str += '<button type="button" id="' + status[i]["Id"] + "r" + '"onclick="changeColor(this.id)" class="' + classNull + '">ראיתי</button>';
+                    str += '<button type="button" id="' + status[i]["Id"] + "b" + '"class="' + classYellow + '">בתהליך</button>';
+                    str += '<button type="button" id="' + status[i]["Id"] + "m" + '"onclick="changeColor(this.id)" class="' + classNull + '">מימשתי</button>';
+                }
+                else {
+                    str += '<button type="button" id="' + status[i]["Id"] + "r" + '"onclick="changeColor(this.id)" class="' + classNull + '">ראיתי</button>';
+                    str += '<button type="button" id="' + status[i]["Id"] + "b" + '"onclick="changeColor(this.id)" class="' + classNull + '">בתהליך</button>';
+                    str += '<button type="button" id="' + status[i]["Id"] + "m" + '"class="' + classGreen + '">מימשתי</button>';
+                }
+                str += '</div>';
+                str += '</div>';
+                str += '</div>';
+                str += '</div>';
+            }
+            document.getElementById("ph").innerHTML = str;
+            console.log(status);
+
+        }
+        function getErrorCB(err) {
+            console.log(err);
+        }
+
+    </script>
+</head>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="header fixed-top d-flex align-items-center">
+
+
+
+        <div class="d-flex align-items-center justify-content-between">
+            <a href="U - home.html" class="logo d-flex align-items-center">
+                <img src="assets/img/logo.png" alt="">
+                <span class="d-none d-lg-block">   זכויותון בית לוינשטיין </span>
+            </a>
+            <i class="bi bi-list toggle-sidebar-btn"></i>
+        </div><!-- End Logo -->
+
+        <!--<div class="search-bar">
+            <form class="search-form d-flex align-items-center" method="POST" action="#">
+                <input type="text" name="query" placeholder="Search" title="Enter search keyword">
+                <button type="submit" title="Search"><i class="bi bi-search"></i></button>
+            </form>
+        </div>--><!-- End Search Bar -->
+
+        <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center">
+
+                <li class="nav-item d-block d-lg-none">
+                    <a class="nav-link nav-icon search-bar-toggle " href="#">
+                        <i class="bi bi-search"></i>
+                    </a>
+                </li><!-- End Search Icon-->
+
+                <li class="nav-item dropdown pe-3">
+
+                    <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                        <img src="assets/img/default-avatar.png" alt="Profile" class="rounded-circle">
+
+                        <span class="d-none d-md-block dropdown-toggle ps-2" id="userName"></span>
+
+                    </a><!-- End Profile Iamge Icon -->
+
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                        <li class="dropdown-header">
+                            <h6 id="userName2"></h6>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="U - users-profile.html">
+                                <i class="bi bi-person"></i>
+                                <span>הפרופיל שלי</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="U - faq.html">
+                                <i class="bi bi-question-circle"></i>
+                                <span>עזרה</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a id="logOUT" class="dropdown-item d-flex align-items-center" href="U-loginUser.html">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>יציאה מהמערכת</span>
+                            </a>
+                        </li>
+
+                    </ul><!-- End Profile Dropdown Items -->
+                </li><!-- End Profile Nav -->
+
+            </ul>
+        </nav><!-- End Icons Navigation -->
+
+    </header><!-- End Header -->
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar">
+
+        <ul class="sidebar-nav" id="sidebar-nav">
+
+            <li class="nav-item">
+                <a class="nav-link " href="U - home.html">
+                    <i class="bi bi-grid"></i>
+                    <span>מסך בית</span>
+                </a>
+            </li><!-- End Dashboard Nav -->
+
+            <li class="nav-heading">מאגרים</li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="U - RightsList.html">
+                    <!--לסדר פה מעבר לעמוד זכויות -->
+                    <i class="bi bi-menu-button-wide"></i>
+                    <span>הזכויות השמורות שלי</span>
+                </a>
+            </li><!-- End מאגר זכויות-->
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="U-quest.html">
+                    <i class="bi bi-person"></i>
+                    <span title="מילוי השאלון מחדש יכול להניב תוצאות חדשות">מילוי שאלון רפואי</span>
+                </a>
+            </li><!-- End מילוי שאלון רפואי -->
+
+        </ul>
+
+    </aside>
+
+    <main id="main" class="main">
+
+        <p style="text-align:center;font-size:40px" class="card-title">
+            הזכויות השמורות שלי
+        </p>
+
+
+        <section class="section dashboard">
+            <div class="row">
+
+                <div dir="rtl" class="row">
+
+                    <div id="ph"></div>
+
+                </div>
+            </div>
+        </section>
+
+    </main><!-- End #main -->
+    <footer id="footer" class="footer">
+        <div class="credits">
+            <img style="height:100px" src="assets/img/BigLogo.png" />
+        </div>
+    </footer><!-- End Footer -->
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/chart.js/chart.min.js"></script>
+    <script src="assets/vendor/echarts/echarts.min.js"></script>
+    <script src="assets/vendor/quill/quill.min.js"></script>
+    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>

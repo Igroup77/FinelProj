@@ -1,0 +1,1043 @@
+﻿
+<!DOCTYPE html>
+<html lang="en" style="height:100%">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous"></script>
+    <title> שאלון מימוש זכויות </title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+    <script src="../Scripts/ajaxCalls.js"></script>
+
+    <!-- For PopUp Form -->
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/css-quotation.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script>
+
+        function updateTextInput(val) {
+            document.getElementById('textInput').value = val;
+        }
+        function validate2(val) {
+
+            if (gender == null) {
+                gender = 3;
+            }
+
+            if (disPercentage == null) {
+                disPercentage = -1;
+            }
+
+            if (citizenship == null) {
+                citizenship = -1;
+            }
+
+            if (income == null) {
+                income = -1;
+            }
+
+            p =
+            {
+                Bdate: birthdate,
+                Gender: gender,
+                DisP: disPercentage,
+                Income: income,
+                Isres: citizenship,
+                WorkDis: workAbilityDamage,
+                AccId: accidentType,
+                Medstat: medConditions
+            }
+            console.log(p);
+            //let apiCall = "../api/Users?user=" + p
+
+            ajaxCall("PUT", "../api/Users", JSON.stringify(p), successCB, errorCB);
+
+        }
+
+        function successCB(status) {
+            console.log(status);
+            localStorage["OutPut"] = JSON.stringify(status);
+            localStorage["MedStat"] = JSON.stringify(medConditions);
+            setTimeout(() => { window.open("U - OutPut.html", "_self"); }, 3000);
+
+        }
+
+        function errorCB(err) {
+            console.log(err);
+        }
+
+
+
+        function validate1(val) {
+            v1 = document.getElementById("fname");
+
+            flag1 = true;
+
+
+            if (val >= 1 || val == 0) {
+                if (v1.value == "") {
+                    v1.style.borderColor = "red";
+                    flag1 = false;
+                }
+                else {
+                    v1.style.borderColor = "green";
+                    flag1 = true;
+                }
+            }
+
+
+
+
+
+            flag = flag1
+
+            return flag;
+        }
+
+        function vlidateGender(val) {
+
+        }
+
+        var gender;
+        var birthdate;
+        var disPercentage;
+        var citizenship;
+        var income;
+        var accidentType;
+        var workAbilityDamage;
+        var medConditions = [];
+
+        $(document).ready(function () {
+            if (localStorage.getItem('UserDetails') === null) {
+                $("#goHomeCenter").attr("onclick", "f1()");
+            }
+            else {
+                $("#goHomeCenter").attr("onclick", "f2()");
+            }
+
+
+            var current_fs, next_fs, previous_fs;
+            var numOfQuests = 7;
+            var clicks = 0;
+
+            var mClicks = 0;         /*question 1 counters*/
+            var fClicks = 0;
+
+            var ISRClicks = 0;         /*question 4 counters*/
+            var OVSClicks = 0;
+
+            var PClicks = 0;         /*question 7 counters*/
+            var RClicks = 0;
+            var WClicks = 0;
+            var OClicks = 0;
+
+            var YClicks = 0;         /*question 8 counters*/
+            var NClicks = 0;
+
+            var EYEClicks = 0;         /*question 9 counters*/
+            var EARClicks = 0;
+            var MENTClicks = 0;
+            var NEUClicks = 0;
+            var CHRClicks = 0;
+            var PARClicks = 0;
+            var AMPClicks = 0;
+            var MOVClicks = 0;
+            var PHYClicks = 0;
+            var GOODClicks = 0;
+
+
+
+
+
+
+
+            $("#EYE").click(function () {
+                EYEClicks++;
+            });
+            $("#EAR").click(function () {
+                EARClicks++;
+            });
+            $("#MENT").click(function () {
+                MENTClicks++;
+            });
+            $("#NEU").click(function () {
+                NEUClicks++;
+            });
+            $("#CHR").click(function () {
+                CHRClicks++;
+            });
+            $("#PAR").click(function () {
+                PARClicks++;
+            });
+            $("#AMP").click(function () {
+                AMPClicks++;
+            });
+            $("#MOV").click(function () {
+                MOVClicks++;
+            });
+            $("#PHY").click(function () {
+                PHYClicks++;
+            });
+            $("#GOOD").click(function () {
+                GOODClicks++;
+            });
+
+
+
+
+
+
+            $("#F").click(function () {
+                fClicks++;
+            });
+            $("#M").click(function () {
+                mClicks++;
+            });
+            $("#birthday").change(function () {
+                birthdate = this.value;
+
+            });
+            $("#percent").change(function () {
+                disPercentage = this.value;
+
+            });
+            $("#ISR").click(function () {
+                ISRClicks++;
+            });
+            $("#OVS").click(function () {
+                OVSClicks++;
+            });
+            $("#inco").change(function () {
+                income = this.value;
+
+            });
+            $("#P").click(function () {
+                PClicks++;
+            });
+            $("#W").click(function () {
+                WClicks++;
+            });
+            $("#R").click(function () {
+                RClicks++;
+            });
+            $("#O").click(function () {
+                OClicks++;
+            });
+            $("#Y").click(function () {
+                YClicks++;
+            });
+            $("#N").click(function () {
+                NClicks++;
+            });
+            $(".next").click(function () {
+
+                str1 = "next1";
+                str2 = "next2";
+                str3 = "next3";
+                str4 = "next4";
+                str5 = "next5";
+                str6 = "next6";
+                str7 = "next7";
+                str8 = "next8";
+                str9 = "next9";
+
+
+                if (str1 == ($(this).attr('id'))) {
+
+                    let count = 0;
+                    let a = fClicks % 2;
+                    let b = mClicks % 2;
+                    let validationString = [a, b];
+                    for (let i = 0; i < validationString.length; i++) {
+                        if (validationString[i] > 0) { count += 1; }
+
+                    }
+                    if (count > 1) {
+                        document.getElementById("genAlert").style.color = "red";
+                        document.getElementById("genAlert").style.visibility = "visible";
+                    }
+
+                    else {
+
+
+                        if (a > 0) {
+                            //alert("female");
+                            gender = 2;
+
+                        }
+                        if (b > 0) {
+                            //alert("male")
+                            gender = 1;
+                        }
+
+
+                        clicks++;
+                        temp = Math.round((clicks / numOfQuests) * 100)
+                        widthString = temp + '%'
+                        document.getElementById("progBar").style.width = widthString;
+
+                        current_fs = $(this).parent().parent();
+                        next_fs = $(this).parent().parent().next();
+
+                        $(current_fs).removeClass("show");
+                        $(next_fs).addClass("show");
+
+
+
+                        current_fs.animate({}, {
+                            step: function () {
+
+                                current_fs.css({
+                                    'display': 'none',
+                                    'position': 'relative'
+                                });
+
+                                next_fs.css({
+                                    'display': 'block'
+                                });
+                            }
+                        });
+                    }
+                }
+                if (str2 == ($(this).attr('id'))) {
+
+                    clicks++;
+                    temp = Math.round((clicks / numOfQuests) * 100)
+                    widthString = temp + '%'
+                    document.getElementById("progBar").style.width = widthString;
+
+                    current_fs = $(this).parent().parent();
+                    next_fs = $(this).parent().parent().next();
+
+                    $(current_fs).removeClass("show");
+                    $(next_fs).addClass("show");
+
+
+
+                    current_fs.animate({}, {
+                        step: function () {
+
+                            current_fs.css({
+                                'display': 'none',
+                                'position': 'relative'
+                            });
+
+                            next_fs.css({
+                                'display': 'block'
+                            });
+                        }
+                    });
+
+                }
+
+                if (str3 == ($(this).attr('id'))) {
+
+                    clicks++;
+                    temp = Math.round((clicks / numOfQuests) * 100)
+                    widthString = temp + '%'
+                    document.getElementById("progBar").style.width = widthString;
+
+                    current_fs = $(this).parent().parent();
+                    next_fs = $(this).parent().parent().next();
+
+                    $(current_fs).removeClass("show");
+                    $(next_fs).addClass("show");
+
+
+
+                    current_fs.animate({}, {
+                        step: function () {
+
+                            current_fs.css({
+                                'display': 'none',
+                                'position': 'relative'
+                            });
+
+                            next_fs.css({
+                                'display': 'block'
+                            });
+                        }
+                    });
+
+                }
+
+                if (str4 == ($(this).attr('id'))) {
+
+
+                    let count = 0;
+                    let a = ISRClicks % 2;
+                    let b = OVSClicks % 2;
+                    let validationString = [a, b];
+                    for (let i = 0; i < validationString.length; i++) {
+                        if (validationString[i] > 0) { count += 1; }
+
+                    }
+                    if (count > 1) {
+                        document.getElementById("citAlert").style.color = "red";
+                        document.getElementById("citAlert").style.visibility = "visible";
+                    }
+
+                    else {
+
+
+                        if (a > 0) {
+                            //alert("ISRAELI CITIZENSIP");
+                            citizenship = 1;
+
+                        }
+                        if (b > 0) {
+                            //alert("NO CITIZENSHIP")
+                            citizenship = 0;
+                        }
+
+
+
+                        clicks++;
+                        temp = Math.round((clicks / numOfQuests) * 100)
+                        widthString = temp + '%'
+                        document.getElementById("progBar").style.width = widthString;
+
+                        current_fs = $(this).parent().parent();
+                        next_fs = $(this).parent().parent().next();
+
+                        $(current_fs).removeClass("show");
+                        $(next_fs).addClass("show");
+
+
+
+                        current_fs.animate({}, {
+                            step: function () {
+
+                                current_fs.css({
+                                    'display': 'none',
+                                    'position': 'relative'
+                                });
+
+                                next_fs.css({
+                                    'display': 'block'
+                                });
+                            }
+                        });
+
+                    }
+                }
+
+
+
+                if (str5 == ($(this).attr('id'))) {
+
+                    clicks++;
+                    temp = Math.round((clicks / numOfQuests) * 100)
+                    widthString = temp + '%'
+                    document.getElementById("progBar").style.width = widthString;
+
+                    current_fs = $(this).parent().parent();
+                    next_fs = $(this).parent().parent().next();
+
+                    $(current_fs).removeClass("show");
+                    $(next_fs).addClass("show");
+
+
+
+                    current_fs.animate({}, {
+                        step: function () {
+
+                            current_fs.css({
+                                'display': 'none',
+                                'position': 'relative'
+                            });
+
+                            next_fs.css({
+                                'display': 'block'
+                            });
+                        }
+                    });
+
+                }
+
+                if (str6 == ($(this).attr('id'))) {
+
+                    clicks++;
+                    temp = Math.round((clicks / numOfQuests) * 100)
+                    widthString = temp + '%'
+                    document.getElementById("progBar").style.width = widthString;
+
+                    current_fs = $(this).parent().parent();
+                    next_fs = $(this).parent().parent().next();
+
+                    $(current_fs).removeClass("show");
+                    $(next_fs).addClass("show");
+
+
+
+                    current_fs.animate({}, {
+                        step: function () {
+
+                            current_fs.css({
+                                'display': 'none',
+                                'position': 'relative'
+                            });
+
+                            next_fs.css({
+                                'display': 'block'
+                            });
+                        }
+                    });
+
+                }
+
+                if (str7 == ($(this).attr('id'))) {
+
+                    let count = 0;
+                    let a = PClicks % 2;
+                    let b = WClicks % 2;
+                    let c = RClicks % 2;
+                    let d = OClicks % 2;
+                    let validationString = [a, b, c, d];
+                    for (let i = 0; i < validationString.length; i++) {
+                        if (validationString[i] > 0) { count += 1; }
+
+                    }
+                    if (count > 1) {
+                        document.getElementById("accTypeAlert").style.color = "red";
+                        document.getElementById("accTypeAlert").style.visibility = "visible";
+                    }
+
+                    else {
+
+
+                        if (a > 0) {
+                            //alert("PERSONAL");
+                            accidentType = 3;
+
+                        }
+                        if (b > 0) {
+                            //alert("WORK")
+                            accidentType = 2;
+                        }
+                        if (c > 0) {
+                            //alert("ROAD")
+                            accidentType = 1;
+                        }
+                        if (d > 0) {
+                            //alert("OTHER")
+                            accidentType = 0;
+                        }
+
+
+                        clicks++;
+                        temp = Math.round((clicks / numOfQuests) * 100)
+                        widthString = temp + '%'
+                        document.getElementById("progBar").style.width = widthString;
+
+                        current_fs = $(this).parent().parent();
+                        next_fs = $(this).parent().parent().next();
+
+                        $(current_fs).removeClass("show");
+                        $(next_fs).addClass("show");
+
+
+
+                        current_fs.animate({}, {
+                            step: function () {
+
+                                current_fs.css({
+                                    'display': 'none',
+                                    'position': 'relative'
+                                });
+
+                                next_fs.css({
+                                    'display': 'block'
+                                });
+                            }
+                        });
+
+                    }
+                }
+
+
+                if (str8 == ($(this).attr('id'))) {
+
+                    let count = 0;
+                    let a = YClicks % 2;
+                    let b = NClicks % 2;
+                    let validationString = [a, b];
+                    for (let i = 0; i < validationString.length; i++) {
+                        if (validationString[i] > 0) { count += 1; }
+
+                    }
+                    if (count > 1) {
+                        document.getElementById("workAlert").style.color = "red";
+                        document.getElementById("workAlert").style.visibility = "visible";
+                    }
+
+                    else {
+
+
+                        if (a > 0) {
+                            //alert("damaged");
+                            workAbilityDamage = 1;
+
+                        }
+                        if (b > 0) {
+                            //alert("not damaged")
+                            workAbilityDamage = 0;
+                        }
+
+
+                        clicks++;
+                        temp = Math.round((clicks / numOfQuests) * 100)
+                        widthString = temp + '%'
+                        document.getElementById("progBar").style.width = widthString;
+
+                        current_fs = $(this).parent().parent();
+                        next_fs = $(this).parent().parent().next();
+
+                        $(current_fs).removeClass("show");
+                        $(next_fs).addClass("show");
+
+
+
+                        current_fs.animate({}, {
+                            step: function () {
+
+                                current_fs.css({
+                                    'display': 'none',
+                                    'position': 'relative'
+                                });
+
+                                next_fs.css({
+                                    'display': 'block'
+                                });
+                            }
+                        });
+                    }
+
+                }
+
+
+                if (str9 == ($(this).attr('id'))) {
+
+                    let count = 0;
+                    let a = EYEClicks % 2;
+                    let b = EARClicks % 2;
+                    let c = MENTClicks % 2;
+                    let d = NEUClicks % 2;
+                    let e = CHRClicks % 2;
+                    let f = PARClicks % 2;
+                    let g = AMPClicks % 2;
+                    let h = MOVClicks % 2;
+                    let i = PHYClicks % 2;
+                    let j = GOODClicks % 2;
+
+
+
+
+
+
+                    if (a > 0) {
+                        medConditions.push(1)
+
+                    }
+                    if (b > 0) {
+                        medConditions.push(2)
+                    }
+                    if (c > 0) {
+                        medConditions.push(3)
+                    }
+                    if (d > 0) {
+                        medConditions.push(4)
+                    }
+                    if (e > 0) {
+                        medConditions.push(5)
+                    }
+                    if (f > 0) {
+                        medConditions.push(6)
+                    }
+
+                    if (g > 0) {
+                        medConditions.push(7)
+                    }
+                    if (h > 0) {
+                        medConditions.push(8)
+                    }
+                    if (i > 0) {
+                        medConditions.push(9)
+                    }
+                    if (j > 0) {
+                        medConditions.push(10)
+                    }
+
+
+
+
+
+                    clicks++;
+                    //alert(medConditions);
+                    temp = Math.round((clicks / numOfQuests) * 100)
+                    widthString = temp + '%'
+                    document.getElementById("progBar").style.width = widthString;
+
+                    current_fs = $(this).parent().parent();
+                    next_fs = $(this).parent().parent().next();
+
+                    $(current_fs).removeClass("show");
+                    $(next_fs).addClass("show");
+
+
+
+                    current_fs.animate({}, {
+                        step: function () {
+
+                            current_fs.css({
+                                'display': 'none',
+                                'position': 'relative'
+                            });
+
+                            next_fs.css({
+                                'display': 'block'
+                            });
+                        }
+                    });
+
+                }
+
+            });
+
+            $(".prev").click(function () {
+
+                clicks--;
+                temp = Math.round((clicks / numOfQuests) * 100)
+                widthString = temp + '%'
+                document.getElementById("progBar").style.width = widthString;
+
+                current_fs = $(this).parent().parent();
+                previous_fs = $(this).parent().parent().prev();
+
+                $(current_fs).removeClass("show");
+                $(previous_fs).addClass("show");
+
+
+                current_fs.animate({}, {
+                    step: function () {
+
+                        current_fs.css({
+                            'display': 'none',
+                            'position': 'relative'
+                        });
+
+                        previous_fs.css({
+                            'display': 'block'
+                        });
+                    }
+                });
+            });
+
+            $('.radio-group .radio').click(function () {
+                $(this).toggleClass('selected');
+            });
+
+        });
+
+        function f1() {
+            window.open("U-loginUser.html", "_self")
+        }
+
+        function f2() {
+            window.open("U - home.html", "_self")
+        }
+
+    </script>
+    <style>
+        .body {
+            height:100% !important;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <!---------------------------התחלה - ראש העמוד----------------------------->
+        <div class="container-fluid px-1 py-5 mx-auto" style="height:100%">
+            <div class="row d-flex justify-content-center">
+                <div class="col-xl-5 col-lg-6 col-md-7">
+                    <div id="goHome" class="card b-0">
+                        <center>
+                            <!--<button id="signUpCenter" onclick="location.href='U-register.html';" class="btn-block  mt-3 mb-1 ">
+                                הירשם למערכת
+                                <span style="vertical-align:top" class="fa fa-male"></span>
+                            </button>‏-->
+
+                            <!--<button id="startOverCenter" onclick="location.href='U-quest.html';" class="btn-block  mt-3 mb-1 ">
+                                מלא שאלון מחדש
+                                <span style="vertical-align:top" class="fa fa-undo"></span>
+                            </button>‏-->
+                            <button id="goHomeCenter" class="btn-block  mt-3 mb-1 ">
+                                דף הבית
+                                <span style="vertical-align:top" class="fa fa-home"></span>
+
+                            </button>
+                        </center>
+                        <h3 dir="rtl" class="heading">שאלון אישי</h3>
+                        <p dir="rtl" class="desc"> ניתן לדלג על שאלה ללא שדות חובה ע''י לחיצה על "הבא" <br>(דילוג על שאלה יפגע בדיוק התאמת הזכויות)</p>
+                        <!---------------------------סוף - ראש העמוד----------------------------->
+                        <!---------------------------התחלה - מד התקדמות----------------------------->
+                        <div class="progress">
+                            <div id="progBar" class="progress-bar" role="progressbar" aria-valuenow="70"
+                                 aria-valuemin="0" aria-valuemax="100" style="width:1%">
+
+                            </div>
+                        </div>
+                        <!---------------------------סוף - מד התקדמות----------------------------->
+                        <!---------------------------התחלה - שאלון----------------------------->
+                        <!---------------------------שאלה 1 ----------------------------->
+
+
+                        <fieldset class="show">
+
+                            <div dir="rtl" class="form-card">
+                                <h5 dir="rtl" class="sub-heading">המין שלך</h5>
+                                <label type="hidden" id="genAlert" style="visibility: hidden ">*יש לבחור אפשרות אחת לכל היותר*</label>
+                                <div class="row px-1 radio-group">
+
+                                    <div id="M" name="gender" class="card-block text-center radio">
+                                        <div class="image-icon"> <img class="icon icon1 fit-image" src="https://cdn-icons-png.flaticon.com/512/1864/1864586.png"> </div>
+                                        <p class="sub-desc">זכר</p>
+                                    </div>
+                                    <div id="F" name="gender" class="card-block text-center radio">
+                                        <div class="image-icon"> <img class="icon icon1 fit-image" src="https://cdn-icons-png.flaticon.com/512/1864/1864598.png"> </div>
+                                        <p class="sub-desc">נקבה</p>
+                                    </div>
+
+                                </div> <button dir="rtl" id="next1" class="btn-block btn-primary mt-3 mb-1 next" onclick="vlidateGender(0)">הבא<span class="fa fa-long-arrow-right"></span></button>
+                            </div>
+                        </fieldset>
+                        <!---------------------------שאלה2 ----------------------------->
+
+                        <fieldset>
+
+                            <div dir="rtl" class="form-card">
+                                <h5 class="sub-heading mb-4">תאריך לידה</h5> <!--<label class="text-danger mb-3">* חובה</label>-->
+                                <div class="form-group"> <label class="form-control-label">תאריך לידה :</label> <input type="date" id="birthday" placeholder="" class="form-control" onblur="validate1(1)"> </div>
+                                <button dir="rtl" id="next2" class="btn-block btn-primary mt-3 mb-1 next mt-4">הבא<span class="fa fa-long-arrow-right"></span></button> <button class="btn-block btn-secondary mt-3 mb-1 prev"><span class="fa fa-long-arrow-left"></span>הקודם</button>
+                            </div>
+                        </fieldset>
+                        <!---------------------------שאלה 3 ----------------------------->
+
+                        <fieldset>
+
+                            <div dir="rtl" class="form-card">
+                                <h5 class="sub-heading mb-4">אחוזי נכות</h5>
+                                <div class="form-group"> <label class="form-control-label">על פי תוצאות הועדה : <p id="rangeValue"></p>   </div> </label> <input type="range" min="0" max="100" dir="ltr" id="percent" placeholder="" class="form-control" onchange="rangeValue.innerText = this.value + '%'">
+                                <div class="form-group">
+                                </div> <button dir="rtl" id="next3" class="btn-block btn-primary mt-3 mb-1 next">הבא<span class="fa fa-long-arrow-right"></span></button><button class="btn-block btn-secondary mt-3 mb-1 prev"><span class="fa fa-long-arrow-left"></span>הקודם</button>
+                            </div>
+                        </fieldset>
+
+
+                        <!---------------------------שאלה 4 ----------------------------->
+
+
+
+                        <fieldset>
+
+                            <div dir="rtl" class="form-card">
+                                <h5 dir="rtl" class="sub-heading">האזרחות שלך</h5>
+                                <label type="hidden" id="citAlert" style="visibility: hidden ">*יש לבחור אפשרות אחת לכל היותר*</label>
+                                <div class="row px-1 radio-group">
+
+                                    <div id="ISR" class="card-block text-center radio">
+                                        <div class="image-icon"> <img class="icon icon1 fit-image" src="https://cdn-icons-png.flaticon.com/512/5331/5331688.png"> </div>
+                                        <p class="sub-desc">ישראלית</p>
+                                    </div>
+                                    <div id="OVS" class="card-block text-center radio">
+                                        <div class="image-icon"> <img class="icon icon1 fit-image" src="https://cdn-icons-png.flaticon.com/512/1684/1684388.png"> </div>
+                                        <p class="sub-desc">לא ישראלית</p>
+                                    </div>
+
+
+                                </div> <button dir="rtl" id="next4" class="btn-block btn-primary mt-3 mb-1 next">הבא<span class="fa fa-long-arrow-right"></span></button><button class="btn-block btn-secondary mt-3 mb-1 prev"><span class="fa fa-long-arrow-left"></span>הקודם</button>
+                            </div>
+                        </fieldset>
+
+                        <!---------------------------שאלה 5 ----------------------------->
+
+                        <fieldset>
+
+                            <div dir="rtl" class="form-card">
+                                <h5 class="sub-heading mb-4">הכנסה חודשית ממוצעת</h5>
+                                <div class="form-group"> <label class="form-control-label">נטו למס הכנסה : <p id="rangeValue2"></p>   </div> </label> <input type="range" min="0" max="30000" step="1000" dir="ltr" id="inco" placeholder="" class="form-control" onchange="rangeValue2.innerText = '+' + this.value">
+                                <div class="form-group">
+                                </div> <button dir="rtl" id="next5" class="btn-block btn-primary mt-3 mb-1 next">הבא<span class="fa fa-long-arrow-right"></span></button><button class="btn-block btn-secondary mt-3 mb-1 prev"><span class="fa fa-long-arrow-left"></span>הקודם</button>
+                            </div>
+                        </fieldset>
+
+
+                        <!---------------------------שאלה 6 ----------------------------->
+                        <!--<fieldset>
+
+        <div dir="rtl" class="form-card">
+            <h5 dir="rtl" class="sub-heading">
+                האם קיימת פגיעה בניידות?
+            </h5>
+            <div class="row px-1 radio-group">
+
+                <div class="card-block text-center radio">
+                    <div class="image-icon"> <img class="icon icon1 fit-image" src="https://cdn-icons-png.flaticon.com/512/390/390973.png"> </div>
+                    <p class="sub-desc">כן</p>
+                </div>
+                <div class="card-block text-center radio">
+                    <div class="image-icon"> <img class="icon icon1 fit-image" src="https://cdn-icons-png.flaticon.com/512/1828/1828665.png"> </div>
+                    <p class="sub-desc">לא</p>
+                </div>
+
+            </div> <button dir="rtl" id="next6" class="btn-block btn-primary mt-3 mb-1 next">הבא<span class="fa fa-long-arrow-right"></span></button><button class="btn-block btn-secondary mt-3 mb-1 prev"><span class="fa fa-long-arrow-left"></span>הקודם</button>
+        </div>
+    </fieldset>-->
+                        <!---------------------------שאלה 7 ----------------------------->
+
+                        <fieldset>
+
+                            <div dir="rtl" class="form-card">
+                                <h5 dir="rtl" class="sub-heading">
+                                    סוג התאונה
+                                </h5>
+                                <label type="hidden" id="accTypeAlert" style="visibility: hidden ">*יש לבחור אפשרות אחת לכל היותר*</label>
+                                <div class="row px-1 radio-group">
+
+                                    <div id="P" class="card-block text-center radio" style="height:200px">
+                                        <div class="image-icon"> <img class="icon icon1 fit-image" src="https://cdn-icons-png.flaticon.com/512/1864/1864586.png"> </div>
+                                        <p class="sub-desc">אישית</p>
+                                    </div>
+
+                                    <div id="R" class="card-block text-center radio" style="height:200px">
+                                        <div class="image-icon"> <img class="icon icon1 fit-image" src="https://cdn-icons-png.flaticon.com/512/4351/4351026.png"> </div>
+                                        <p class="sub-desc">דרכים</p>
+                                    </div>
+                                    <div id="W" class="card-block text-center radio" style="height:200px">
+                                        <div class="image-icon"> <img class="icon icon1 fit-image" src="https://cdn-icons-png.flaticon.com/512/3588/3588614.png"> </div>
+                                        <p class="sub-desc">עבודה</p>
+                                    </div>
+                                    <div id="O" class="card-block text-center radio" style="height:200px">
+                                        <div class="image-icon"> <img class="icon icon1 fit-image" src="https://cdn-icons-png.flaticon.com/512/942/942745.png"> </div>
+                                        <p class="sub-desc">אחר</p>
+                                    </div>
+
+                                </div> <button dir="rtl" id="next7" class="btn-block btn-primary mt-3 mb-1 next">הבא<span class="fa fa-long-arrow-right"></span></button><button class="btn-block btn-secondary mt-3 mb-1 prev"><span class="fa fa-long-arrow-left"></span>הקודם</button>
+                            </div>
+                        </fieldset>
+
+
+                        <!---------------------------שאלה8 ----------------------------->
+
+                        <fieldset>
+
+                            <div dir="rtl" class="form-card">
+                                <h5 dir="rtl" class="sub-heading">
+                                    האם קיימת פגיעה בכושר עבודה?
+                                </h5>
+                                <label type="hidden" id="workAlert" style="visibility: hidden ">*יש לבחור אפשרות אחת לכל היותר*</label>
+                                <div class="row px-1 radio-group">
+
+                                    <div id="Y" class="card-block text-center radio">
+                                        <div class="image-icon"> <img class="icon icon1 fit-image" src="https://cdn-icons-png.flaticon.com/512/390/390973.png"> </div>
+                                        <p class="sub-desc">כן</p>
+                                    </div>
+                                    <div id="N" class="card-block text-center radio">
+                                        <div class="image-icon"> <img class="icon icon1 fit-image" src="https://cdn-icons-png.flaticon.com/512/1828/1828665.png"> </div>
+                                        <p class="sub-desc">לא</p>
+                                    </div>
+
+                                </div> <button dir="rtl" id="next8" class="btn-block btn-primary mt-3 mb-1 next">הבא<span class="fa fa-long-arrow-right"></span></button><button class="btn-block btn-secondary mt-3 mb-1 prev"><span class="fa fa-long-arrow-left"></span>הקודם</button>
+                            </div>
+                        </fieldset>
+
+
+                        <!---------------------------שאלה 9 ----------------------------->
+
+                        <fieldset>
+
+                            <div dir="rtl" class="form-card">
+                                <h5 dir="rtl" class="sub-heading">
+                                    בחר/י את המצבים הרפואיים שלך
+                                </h5>
+                                <div class="row px-1 radio-group">
+
+                                    <div id="EYE" class="card-block text-center radio" style="height:90px">
+                                        <p class="sub-desc">מגבלת ראיה</p>
+                                    </div>
+                                    <div id="EAR" class="card-block text-center radio" style="height:90px">
+                                        <p class="sub-desc">מגבלת שמיעה</p>
+                                    </div>
+                                    <div id="MENT" class="card-block text-center radio" style="height:90px">
+                                        <p class="sub-desc">מגבלה נפשית</p>
+                                    </div>
+                                    <div id="NEU" class="card-block text-center radio" style="height:90px">
+                                        <p class="sub-desc">בעיה ניאורולוגית</p>
+                                    </div>
+
+                                    <div id="CHR" class="card-block text-center radio" style="height:90px">
+                                        <p class="sub-desc">מחלה כרונית</p>
+                                    </div>
+                                    <div id="PAR" class="card-block text-center radio" style="height:90px">
+                                        <p class="sub-desc">שיתוק</p>
+                                    </div>
+                                    <div id="AMP" class="card-block text-center radio" style="height:90px">
+                                        <p class="sub-desc">קטיעת גפיים</p>
+                                    </div>
+                                    <div id="MOV" class="card-block text-center radio" style="height:90px">
+                                        <p class="sub-desc">פגיעה בכושר ניידות</p>
+                                    </div>
+                                    <div id="PHY" class="card-block text-center radio" style="height:90px">
+                                        <p class="sub-desc">נכות פיזית/מוגבלות רפואית אחרת</p>
+                                    </div>
+                                    <div id="GOOD" class="card-block text-center radio" style="height:90px">
+                                        <p class="sub-desc">מצב בריאותי תקין</p>
+                                    </div>
+
+                                </div> <button id="next9" class="btn-block btn-primary mt-3 mb-1 next mt-4" onclick="validate2(0)">סיום<span class="fa fa-check"></span></button> <button class="btn-block btn-secondary mt-3 mb-1 prev"><span class="fa fa-long-arrow-left"></span>הקודם</button>
+                            </div>
+                        </fieldset>
+
+                        <!---------------------------חיווי השלמת שאלון ----------------------------->
+
+                        <fieldset>
+
+                            <div dir="rtl" class="form-card">
+                                <h5 class="sub-heading mb-4">השאלון הושלם בהצלחה!</h5>
+                                <p class="message">המערכת סורקת עבור זכויות המתאימות לך<br>בעוד כמה רגעים תועבר לתצוגת הזכויות</p>
+                                <div class="check"> <img class="fit-image check-img" src="https://i.imgur.com/QH6Zd6Y.gif"> </div>
+                            </div>
+                        </fieldset>
+
+                        <!---------------------------סוף - שאלון----------------------------->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
